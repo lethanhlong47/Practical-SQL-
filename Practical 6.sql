@@ -73,8 +73,8 @@ SELECT  DATE_FORMAT(trans_date, '%Y-%m') as month,
         country, 
         COUNT(id) AS trans_count, 
         SUM(CASE WHEN state = 'approved' THEN 1 ELSE 0 END) AS approved_count,
-       SUM(amount) AS trans_total_amount,
-       SUM(CASE WHEN state = 'approved' THEN amount ELSE 0 END) AS approved_total_amount
+        SUM(amount) AS trans_total_amount,
+        SUM(CASE WHEN state = 'approved' THEN amount ELSE 0 END) AS approved_total_amount
 FROM  Transactions
 GROUP BY month,country
 
@@ -111,4 +111,42 @@ AND manager_id NOT IN (
 )
 ORDER BY employee_id;
 
---
+--ex10: leetcode-primary-department-for-each-employee.
+SELECT employee_id, department_id
+FROM Employee 
+WHERE primary_flag = 'Y'
+UNION
+SELECT employee_id, department_id
+FROM Employee 
+GROUP BY employee_id
+HAVING COUNT(employee_id) = 1
+ORDER BY employee_id;
+
+ex11: leetcode-movie-rating.
+(SELECT name AS results
+FROM MovieRating JOIN Users on MovieRating.user_id = Users.user_id
+GROUP BY name
+ORDER BY COUNT(*) DESC, name
+Limit 1)
+union
+(SELECT title AS results
+FROM MovieRating JOIN Movies on MovieRating.movie_id = Movies.movie_id
+WHERE EXTRACT(YEAR_MONTH FROM created_at) = 202002
+GROUP BY title
+ORDER BY AVG(rating) DESC, title
+LIMIT 1)
+
+--ex12: leetcode-who-has-the-most-friends.
+WITH all AS 
+(
+    SELECT requester_id AS id 
+    FROM RequestAccepted
+    UNION ALL
+    SELECT accepter_id AS id
+    FROM RequestAccepted
+)
+SELECT id, COUNT(*) AS num
+FROM all
+GROUP BY id 
+ORDER BY num DESC
+LIMIT 1
